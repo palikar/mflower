@@ -34,7 +34,8 @@ Scope::~Scope()
 }
 
 
-Tensor::Tensor()
+Tensor::Tensor(const TensorType type):
+  type(type)
 {
 
 }
@@ -45,7 +46,33 @@ Tensor::~Tensor()
 }
 
 
-Constant::Constant(double value):value(value)
+double TensorArray::evaluate(const Scope& scope)
+{
+  return 0;
+}
+
+
+TensorArray:: TensorArray(ArrayType type):
+  Tensor(TensorType::Array),
+  arr_type(type)
+{
+  
+}
+
+void TensorArray::add_tensor(Tensor* t)
+{
+  this->tensors.push_back(t);
+}
+
+std::vector<Tensor*>& TensorArray::get_elements()
+{
+  return this->tensors;
+}
+
+TensorArray::~TensorArray()
+{}
+
+Constant::Constant(double value): Tensor(TensorType::Scalar), value(value)
 {
   
 }
@@ -62,7 +89,7 @@ Constant::~Constant()
 
 }
 
-Variable::Variable(const std::string name) : name(name)
+Variable::Variable(const std::string name) :Tensor(TensorType::Scalar), name(name)
 {
   
   

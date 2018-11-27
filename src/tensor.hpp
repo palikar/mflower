@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 
@@ -22,17 +23,43 @@ enum class TensorType {
 	Scalar,
 	Matrix,
 	Array,
-	Operatorion
+	Operation
+};
+
+
+enum class ArrayType {
+  Scalar,
+  Matrix
 };
 
 class Tensor
 {
 public:
-	Tensor  ();
+  Tensor(const TensorType type);
 
-	virtual double evaluate(const Scope& scope) = 0;
-	virtual ~Tensor();
+  virtual double evaluate(const Scope& scope) = 0;
+  virtual ~Tensor();
+  TensorType type;
+private:
 };
+
+
+class TensorArray : public Tensor
+{
+public:
+  TensorArray(ArrayType type);
+
+  virtual double evaluate(const Scope& scope);
+  void add_tensor(Tensor* t);
+  std::vector<Tensor*>& get_elements();
+  virtual ~TensorArray();
+  ArrayType arr_type;
+private:
+  std::vector<Tensor*> tensors;
+};
+
+
+
 
 class Constant : public Tensor
 {
