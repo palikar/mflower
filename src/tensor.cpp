@@ -16,6 +16,11 @@ Tensor::Tensor(const TensorType type):
 {
 }
 
+size_t Tensor::get_size() const
+{
+  return this->data_size;
+};
+
 
 Tensor::~Tensor()
 {
@@ -54,14 +59,14 @@ Constant::Constant(double value):
 {
   this->data_buffer = (double*) new double();
   *this->data_buffer = value;
-  this->elements_cnt = 1;
+  this->data_size = 1;
 }
 
 Constant::Constant(std::vector<double> values):
   Tensor(TensorType::Scalar, Shape(values.size()))
 {
   this->data_buffer = (double*) new double[sizeof(double)*values.size()]();
-  this->elements_cnt = values.size();
+  this->data_size = values.size();
   size_t index = 0;
   for(auto& val : values)
     this->data_buffer[index++] = val;
@@ -72,7 +77,7 @@ Constant::Constant(double* values, int columns, int rows):
   Tensor(TensorType::Scalar, Shape(columns, rows))
 {
   this->data_buffer = (double*) new double[sizeof(double)*columns*rows]();
-  this->elements_cnt = columns*rows;
+  this->data_size = columns*rows;
   for (int i = 0; i < columns*rows; ++i)
     this->data_buffer[i] = values[i];
 }

@@ -21,6 +21,7 @@ double* Scope::get_variable_value(const std::string& name) const
 Variable* Scope::new_variable(const std::string& name, double default_value)
 {
   Variable* new_var = new Variable(name, Shape());
+  new_var->data_size = 1;
   this->variables[name] = (double*) new(double);
   *this->variables[name] = default_value;
   return new_var;
@@ -30,6 +31,7 @@ Variable* Scope::new_variable(const std::string& name, double default_value)
 Variable* Scope::new_variable(const std::string& name, std::vector<double> default_value)
 {
   Variable* new_var = new Variable(name, Shape(default_value.size()));
+  new_var->data_size = default_value.size();
   this->variables[name] = (double*) new double[sizeof(double)*default_value.size()]();
 
   size_t index = 0;
@@ -53,6 +55,7 @@ Variable* Scope::new_variable(const std::string& name, Shape shape)
   if (shape.z >= 1)
     num *= shape.x;
 
+  new_var->data_size = num;
   this->variables[name] = (double*) new(double);
   this->variables[name] = new double[num]();
   return new_var;

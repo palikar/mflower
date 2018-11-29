@@ -42,15 +42,16 @@ public:
   Tensor(const TensorType type, const Shape shape);
   Tensor(const TensorType type);
   
-  virtual double* evaluate(const Scope& scope) = 0; 
-
-
+  virtual double* evaluate(const Scope& scope) = 0;
   virtual ~Tensor();
+
+  size_t get_size() const;
   
   TensorType type;
   Shape shape;
 protected:
   double* data_buffer;
+public:
   size_t data_size;
 };
 
@@ -81,7 +82,6 @@ public:
   double* evaluate(const Scope& scope);
   virtual ~Constant();
 private:
-  size_t elements_cnt;
   double* data_buffer;
 };
 
