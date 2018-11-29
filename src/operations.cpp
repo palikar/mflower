@@ -1,6 +1,8 @@
 #include <cmath>
 #include <iostream>
+
 #include "operations.hpp"
+
 
 
 double Add::evaluate(const Scope& scope)

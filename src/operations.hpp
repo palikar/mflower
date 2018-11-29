@@ -1,6 +1,9 @@
 #pragma once
-#include "tensor.hpp"
 
+#include "tensor.hpp"
+#include "scope.hpp"
+
+#include "shape.hpp"
 
 
 
@@ -10,7 +13,15 @@ public:
   Add(Tensor* rhs, Tensor* lhs) :
     Tensor(TensorType::Operation),
     rhs(rhs),
-    lhs(lhs){};
+    lhs(lhs){
+
+
+    if(rhs->shape.dim == 0 && lhs->shape.dim == 0){
+      return;
+    }
+
+
+  };
   double evaluate(const Scope& scope);  
   virtual ~Add(){}
 private:
