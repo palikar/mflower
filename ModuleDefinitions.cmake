@@ -7,9 +7,9 @@ set(INCL_DIR_PRIVATE "include_private")
 set(BIN_NAME "flow")
 
 set(MODULE_SRC
-    ${SRC_DIR}/flow.cpp
+    # ${SRC_DIR}/flow.cpp
     ${SRC_DIR}/tensor.cpp
-    ${SRC_DIR}/operations.cpp
+    # ${SRC_DIR}/operations.cpp
     ${SRC_DIR}/scope.cpp
     ${SRC_DIR}/shape.cpp
     )

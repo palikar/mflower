@@ -7,7 +7,7 @@ public:
     x(-1),
     y(-1),
     z(-1),
-    dim(-1)
+    dim(0)
     {};
   Shape(int i):
     x(i),

@@ -16,12 +16,7 @@ public:
     lhs(lhs){
 
 
-    if(rhs->shape.dim == 0 && lhs->shape.dim == 0){
-      return;
-    }
-
-
-  };
+};
   double evaluate(const Scope& scope);  
   virtual ~Add(){}
 private:

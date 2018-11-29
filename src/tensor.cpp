@@ -23,9 +23,9 @@ Tensor::~Tensor()
 }
 
 
-double TensorArray::evaluate(const Scope& scope)
+double* TensorArray::evaluate(const Scope& scope)
 {
-  return 0;
+  return nullptr;
 }
 
 
@@ -50,33 +50,65 @@ TensorArray::~TensorArray()
 {}
 
 Constant::Constant(double value):
-  Tensor(TensorType::Scalar, Shape(0)),
-  value(value)
+  Tensor(TensorType::Scalar, Shape())
 {
-  
+  this->data_buffer = (double*) new double();
+  *this->data_buffer = value;
+  this->elements_cnt = 1;
 }
-  
-double Constant::evaluate(const Scope& scope)
-{
-  return this->value;
 
+Constant::Constant(std::vector<double> values):
+  Tensor(TensorType::Scalar, Shape(values.size()))
+{
+  this->data_buffer = (double*) new double[sizeof(double)*values.size()]();
+  this->elements_cnt = values.size();
+  size_t index = 0;
+  for(auto& val : values)
+    this->data_buffer[index++] = val;
+}
+
+
+Constant::Constant(double* values, int columns, int rows):
+  Tensor(TensorType::Scalar, Shape(columns, rows))
+{
+  this->data_buffer = (double*) new double[sizeof(double)*columns*rows]();
+  this->elements_cnt = columns*rows;
+  for (int i = 0; i < columns*rows; ++i)
+    this->data_buffer[i] = values[i];
+}
+
+
+  
+double* Constant::evaluate(const Scope& scope)
+{
+  return this->data_buffer;
 }
 
 
 Constant::~Constant()
 {
-
+  delete this->data_buffer;
 }
 
 Variable::Variable(const std::string name) :
-  Tensor(TensorType::Scalar,Shape(0)),
+  Tensor(TensorType::Scalar,Shape()),
   name(name)
 {
   
   
 }
+
+
+Variable::Variable(const std::string name, Shape shape) :
+  Tensor(TensorType::Scalar, shape),
+  name(name)
+{
   
-double Variable::evaluate(const Scope& scope)
+  
+}
+
+  
+double* Variable::evaluate(const Scope& scope)
 {
   return scope.get_variable_value(this->name);
 }
