@@ -33,6 +33,7 @@ set_target_properties(${BIN_NAME} PROPERTIES
     CXX_STANDARD 17
     CXX_EXTENSIONS OFF
     )
+
 install(TARGETS ${BIN_NAME} DESTINATION "bin")
 install(
     DIRECTORY "${INCL_DIR}/${PROJECT_NAME}"

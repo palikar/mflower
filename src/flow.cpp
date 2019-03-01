@@ -1,26 +1,37 @@
-
 #include <iostream>
 #include "tensor.hpp"
 #include "operations.hpp"
 #include <vector>
+#include <algorithm>
+
+
+
 
 int main(int argc, char* argv[])
 {
-  Scope default_scope;
-
-  Tensor* x = default_scope.new_variable("x", 10.0);
+	Scope default_scope;
+	
+	Tensor* x = default_scope.new_variable("x", 10.0);
 
   
-  // Tensor* a = new Constant(5.0);
+	// Tensor* a = new Constant(5.0);
   // Tensor* b = new Constant(2.0);
 
   std::vector<double> aa = {3,4};
   std::vector<double> bb = {5,6};
 
+  
   Tensor* a = new Constant(10);
-  Tensor* b = new Constant(bb);
+  Tensor* b = new Constant(aa);
+  
+
+  std::vector<std::string> strs;
+  
   
   Tensor* sum = new Add(a, b);
+
+  
+
 
   // TensorArray* ar = new TensorArray(ArrayType::Scalar);
   
@@ -30,7 +41,7 @@ int main(int argc, char* argv[])
 
   // Tensor* res = new Sum(ar);
   
-  // Tensor* res = new Devide(new Sub(new Multiply(sum, b), b), x);
+  // Tensor* res = new Devide(new Sub(new Multiply(sum, a), a), x);
   
 
   
@@ -40,3 +51,11 @@ int main(int argc, char* argv[])
   // std::cout << *res->evaluate(default_scope)  << "\n";
   std::cout << "It works!"  << "\n";
 }
+
+
+
+
+std::for_each(std::begin(container), std::end(container), []() {
+															  
+														  });
+

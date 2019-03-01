@@ -30,9 +30,9 @@ public:
   
   virtual ~Shape(){};
   
-  int dim;
   int x;
   int y;
   int z;
+  int dim;
 private:
 };
