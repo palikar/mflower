@@ -1,9 +1,3 @@
-build_debug/
-build/
-build_release/
-
-
-
 # Prerequisites
 *.d
 
@@ -37,4 +31,7 @@ build_release/
 *.out
 *.app
 
+build*/**
+build*
 
+.idea/
