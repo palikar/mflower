@@ -130,7 +130,7 @@ set(VERSION_PATCH 0)
 
 
 add_subdirectory(libs)
-add_subdirectory(mflower-dev)
+add_subdirectory(mflower)
 
 
 
