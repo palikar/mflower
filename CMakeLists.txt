@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
-project(mflower-dev LANGUAGES CXX)
+project(mflower LANGUAGES CXX)
 
 include(cmake/safeguards.cmake)
 
 include(GNUInstallDirs)
 
+
+#######################################################################
+#######################################################################
+############################     Options     ##########################
+#######################################################################
+#######################################################################
 
 
 option(ONLY_COVERAGE "Build only tests necessary for coverage" FALSE)
@@ -15,6 +21,13 @@ option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" FALSE)
 option(ENABLE_TESTING "Enable the building of the test" FALSE)
 option(ENABLE_CLANG_TIDY "Enable testing with clang-tidy" FALSE)
 option(ENABLE_CPPCHECK "Enable testing with cppcheck" FALSE)
+option(SIMPLE_BUILD "Build the project as minimally as possible" FALSE)
+
+
+#######################################################################
+#######################################################################
+
+
 
 
 
@@ -22,8 +35,8 @@ add_library(project_warnings INTERFACE)
 add_library(project_options INTERFACE)
 
 
-
 target_compile_features(project_options INTERFACE cxx_std_17)
+
 
 if(ONLY_COVERAGE OR ENABLE_COVERAGE)
     target_compile_options(project_options INTERFACE --coverage -O0 -g)
@@ -38,9 +51,9 @@ endif()
 
 
 
-
 target_compile_options(project_warnings
     INTERFACE -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic  -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2 )
+
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -50,10 +63,12 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 
+
 find_program(CCACHE ccache)
 if(CCACHE)
 	set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
 endif()
+
 
 
 if(ENABLE_CPPCHECK)
@@ -98,6 +113,19 @@ conan_cmake_run(CONANFILE
 
 
 
+if(ENABLE_TESTING)
+	enable_testing()
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+
+#######################################################################
+#######################################################################
+###########################    Libraries     ##########################
+#######################################################################
+#######################################################################
+
 if(CONAN_CATCH2_ROOT_DEBUG)
 	include(${CONAN_CATCH2_ROOT_DEBUG}/lib/cmake/Catch2/Catch.cmake)
 else()
@@ -109,29 +137,46 @@ find_package(Catch2 REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-
-# find_package(rang REQUIRED)
-
 find_package(fmt)
 
 find_package(spdlog)
 
 
-if(ENABLE_TESTING)
-	enable_testing()
-endif()
+
+#######################################################################
+#######################################################################
 
 
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set(VERSION_MAJOR 1)
-set(VERSION_MINOR 0)
-set(VERSION_PATCH 0)
+
+
+set(MF_VERSION_MAJOR 1)
+set(MF_VERSION_MINOR 0)
+set(MF_VERSION_PATCH 0)
+
+configure_file (
+	"${PROJECT_SOURCE_DIR}/mflower/include/mflower/config.hpp.in"
+	"${PROJECT_BINARY_DIR}/mflower/include/mflower/config.hpp"
+	)
+include_directories("${PROJECT_BINARY_DIR}/mflower/include")
+
+install (FILES
+	"${PROJECT_BINARY_DIR}/mflower/include/mflower/config.hpp"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mflower/
+	)
+
+
+
+include (InstallRequiredSystemLibraries)
+set (CPACK_RESOURCE_FILE_LICENSE  
+    "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set (CPACK_PACKAGE_VERSION_MAJOR "${MF_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION_MINOR "${MF_VERSION_MINOR}")
+include (CPack)
 
 
 add_subdirectory(libs)
 add_subdirectory(mflower)
-
 
 
 message("#########################################")
@@ -146,8 +191,10 @@ message("Compiler:         \t ${CMAKE_CXX_COMPILER_ID}")
 message("Sanizizers:       \t ${ENABLE_ASAN}")
 message("Shared libs:      \t ${BUILD_SHARED_LIBS}")
 message("Build libcpp:     \t ${LIBCPP}")
+message("CCache executable:\t ${CCACHE}")
+message("Simple build:     \t ${SIMPLE_BUILD}")
 message("------------------------------------------")
-message("Version:        \t ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+message("Version:        \t ${MF_VERSION_MAJOR}.${MF_VERSION_MINOR}.${MF_VERSION_PATCH}")
 message("########################################")
 
 
