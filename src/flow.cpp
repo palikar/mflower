@@ -24,12 +24,13 @@ int main(int argc, char* argv[])
     std::vector<std::string> strs;
 
 
-    Tensor *sum = new Add(a, b);
+		Tensor *sum = new Add(a, b);
 
+		TensorArray *ar = new TensorArray(ArrayType::Scalar);
 
-    TensorArray *ar = new TensorArray(ArrayType::Scalar);
+		
 
-    ar->add_tensor(a);
+		ar->add_tensor(a);
     ar->add_tensor(b);
     ar->add_tensor(sum);
 
@@ -39,6 +40,5 @@ int main(int argc, char* argv[])
 
     std::cout << *res->evaluate(default_scope) << "\n";
 
-    std::cout << "It works!"
-              << "\n";
+    std::cout << "It works!\n";
 }
