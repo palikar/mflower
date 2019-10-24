@@ -5,40 +5,35 @@
 #include <algorithm>
 
 
-
-
 int main(int argc, char* argv[])
 {
+	// Scope default_scope;
+	// Tensor *x = default_scope.new_variable("x", 10.0);
 
-    Scope default_scope;
-    Tensor *x = default_scope.new_variable("x", 10.0);
-
-    std::vector<double> aa = { 3, 4 };
-    std::vector<double> bb = { 5, 6 };
-
-
-    Tensor *a = new Constant(10);
-    Tensor *b = new Constant(aa);
+	// std::vector<double> aa = { 3, 4 };
+	// std::vector<double> bb = { 5, 6 };
 
 
-    std::vector<std::string> strs;
+	// Tensor *a = new Constant(10);
+	// Tensor *b = new Constant(aa);
 
 
-		Tensor *sum = new Add(a, b);
+	// std::vector<std::string> strs;
 
-		TensorArray *ar = new TensorArray(ArrayType::Scalar);
 
-		
+	// Tensor *sum = new Add(a, b);
 
-		ar->add_tensor(a);
-    ar->add_tensor(b);
-    ar->add_tensor(sum);
+	// TensorArray *ar = new TensorArray(ArrayType::Scalar);
 
-    Tensor *res = new Sum(ar);
+	// ar->add_tensor(a);
+	// ar->add_tensor(b);
+	// ar->add_tensor(sum);
 
-    res = new Devide(new Sub(new Multiply(sum, a), a), x);
+	// Tensor *res = new Sum(ar);
 
-    std::cout << *res->evaluate(default_scope) << "\n";
+	// res = new Devide(new Sub(new Multiply(sum, a), a), x);
 
-    std::cout << "It works!\n";
+	// std::cout << *res->evaluate(default_scope) << "\n";
+
+	// std::cout << "It works!\n";
 }

@@ -15,7 +15,7 @@ add_library(project_warnings INTERFACE)
 add_library(project_options INTERFACE)
 
 target_compile_features(project_options INTERFACE cxx_std_17)
-target_include_directories(project_options INTERFACE include external)
+target_include_directories(project_options INTERFACE include)
 
 
 option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
@@ -119,6 +119,7 @@ endif()
 
 
 add_subdirectory(libs)
+include_directories(libs/ranges)
 
 #
 # Project setup
@@ -136,7 +137,7 @@ set(MFLOWER_LIB_SRCS
 add_library(mflower_lib ${MFLOWER_LIB_SRCS})
 target_link_libraries(mflower_lib
     PRIVATE project_options project_warnings)
-target_include_directories(mflower_lib PUBLIC ./include PRIVATE ./src)
+target_include_directories(mflower_lib PUBLIC include PRIVATE src)
 target_link_libraries(mflower_lib
     PRIVATE Threads::Threads)
 

@@ -15,53 +15,54 @@ public:
   Add(Tensor* rhs, Tensor* lhs) :
     Tensor(TensorType::Operation),
     rhs(rhs),
-    lhs(lhs){
-    if(rhs->shape.dim == 0 || lhs->shape.dim == 0)
-    {
-      const size_t new_size = std::max(lhs->get_size(),rhs->get_size());
-      this->data_size = new_size;
-      this->data_buffer = new double[new_size]();
-      return;
-    }
+    lhs(lhs)
+		{
+			if(rhs->shape.dim == 0 || lhs->shape.dim == 0)
+			{
+				const size_t new_size = std::max(lhs->get_size(),rhs->get_size());
+				this->data_size = new_size;
+				this->data_buffer = new double[new_size]();
+				return;
+			}
     
-    if(rhs->shape.dim == 1 && lhs->shape.dim == 1)
-    {
-      if(rhs->shape.x == lhs->shape.x)
-      {
-        const size_t new_size = lhs->get_size();
-        this->data_size = new_size;
-        this->data_buffer = new double[new_size]();
-        return;
-      }  
-    }
+			if(rhs->shape.dim == 1 && lhs->shape.dim == 1)
+			{
+				if(rhs->shape.x == lhs->shape.x)
+				{
+					const size_t new_size = lhs->get_size();
+					this->data_size = new_size;
+					this->data_buffer = new double[new_size]();
+					return;
+				}  
+			}
     
-    if(rhs->shape.dim == 2 && lhs->shape.dim == 2)
-    {
-      if(rhs->shape.x == lhs->shape.x
-         && rhs->shape.y == lhs->shape.y)
-      {
-        const size_t new_size = lhs->get_size();
-        this->data_size = new_size;
-        this->data_buffer = new double[new_size]();
-        return;
-      }  
-    }
+			if(rhs->shape.dim == 2 && lhs->shape.dim == 2)
+			{
+				if(rhs->shape.x == lhs->shape.x
+					 && rhs->shape.y == lhs->shape.y)
+				{
+					const size_t new_size = lhs->get_size();
+					this->data_size = new_size;
+					this->data_buffer = new double[new_size]();
+					return;
+				}  
+			}
 
-    if(rhs->shape.dim == 3 && lhs->shape.dim == 3)
-    {
-      if(rhs->shape.x == lhs->shape.x
-         && rhs->shape.y == lhs->shape.y
-         && rhs->shape.y == lhs->shape.y)
-      {
-        const size_t new_size = lhs->get_size();
-        this->data_size = new_size;
-        this->data_buffer = new double[new_size]();
-        return;
-      }  
-    }
-    std::cout << "No, shape missmatch" << "\n";
-    exit(1);
-  };
+			if(rhs->shape.dim == 3 && lhs->shape.dim == 3)
+			{
+				if(rhs->shape.x == lhs->shape.x
+					 && rhs->shape.y == lhs->shape.y
+					 && rhs->shape.y == lhs->shape.y)
+				{
+					const size_t new_size = lhs->get_size();
+					this->data_size = new_size;
+					this->data_buffer = new double[new_size]();
+					return;
+				}  
+			}
+			std::cout << "No, shape missmatch" << "\n";
+			exit(1);
+		};
   double* evaluate(const Scope& scope);  
   virtual ~Add(){}
 private:
@@ -312,6 +313,3 @@ public:
 private:
   Tensor* arr;
 };
-
-
-
