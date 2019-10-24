@@ -1,39 +1,19 @@
 #include <iostream>
-#include "tensor.hpp"
-#include "operations.hpp"
 #include <vector>
 #include <algorithm>
 
+#include "tensor.hpp"
 
 int main(int argc, char* argv[])
 {
-	// Scope default_scope;
-	// Tensor *x = default_scope.new_variable("x", 10.0);
-
-	// std::vector<double> aa = { 3, 4 };
-	// std::vector<double> bb = { 5, 6 };
+    auto blk = mf::DataBlock<double>{10, 10};
 
 
-	// Tensor *a = new Constant(10);
-	// Tensor *b = new Constant(aa);
+    std::cout << blk.dims() << "\n";
+    std::cout << blk.length() << "\n";
 
 
-	// std::vector<std::string> strs;
-
-
-	// Tensor *sum = new Add(a, b);
-
-	// TensorArray *ar = new TensorArray(ArrayType::Scalar);
-
-	// ar->add_tensor(a);
-	// ar->add_tensor(b);
-	// ar->add_tensor(sum);
-
-	// Tensor *res = new Sum(ar);
-
-	// res = new Devide(new Sub(new Multiply(sum, a), a), x);
-
-	// std::cout << *res->evaluate(default_scope) << "\n";
-
-	// std::cout << "It works!\n";
+    std::cout << blk(5,5) << "\n";
+    
+    std::cout << "It works!\n";
 }

@@ -1,99 +1,136 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <initializer_list>
+#include <ranges.hpp>
 
 #include "shape.hpp"
 
 
-class Variable;
-class Scope
+
+namespace mf
 {
-public:
-	Scope();
 
-	double* get_variable_value(const std::string& name) const;
+namespace ut = ranges;
 
-	Variable* new_variable(const std::string& name, double default_value);
-	Variable* new_variable(const std::string& name, std::vector<double> default_value);
-	Variable* new_variable(const std::string& name, Shape shape);
 
-	virtual ~Scope();
-private:
-	std::unordered_map<std::string, double*> variables;
+// Forward declarations
+class EvaluationContext;
+class ReturnHandler;
+
+enum class TensorType
+{
+    Variable,
+    Constant,
+    Operation
 };
-
-
-enum class TensorType {
-	Scalar,
-	Matrix,
-	Array,
-	Operation
-};
-
-enum class ArrayType {
-	Scalar,
-	Matrix
-};
-
 
 class Tensor
 {
-public:
-	Tensor(const TensorType type, const Shape shape);
-	Tensor(const TensorType type);
-	virtual ~Tensor();
+  public:
+    Tensor(std::string name, TensorType type) : m_id(std::move(name)), m_type(type)
+    {}
 
-	virtual double* evaluate(const Scope& scope) = 0;
+    virtual ~Tensor()
+    {}
 
-	size_t get_size() const;
-	
-	TensorType type;
-	Shape shape;
-	
-protected:
-	double* data_buffer;
-	size_t data_size;
+    virtual void eval(EvaluationContext, ReturnHandler) = 0;
+
+  private:
+    std::string m_id;
+    TensorType m_type;
 };
 
-
-class TensorArray : public Tensor
+template<typename T>
+class DataBlock
 {
-public:
-	TensorArray(ArrayType type);
+  public:
 
-	virtual double* evaluate(const Scope& scope);
-	void add_tensor(Tensor* t);
-	std::vector<Tensor*>& get_elements();
-	virtual ~TensorArray();
-	ArrayType arr_type;
-private:
-	std::vector<Tensor*> tensors;
+    explicit DataBlock(size_t i) : m_shape({i})
+    {
+        this->init_memory();
+    }
+
+    DataBlock(size_t i, size_t j) : m_shape({i, j})
+    {
+        this->init_memory();
+    }
+
+    DataBlock(size_t i, size_t j, size_t k) : m_shape({i, j, k})
+    {
+        this->init_memory();
+    }
+
+    ~DataBlock()
+    {
+    };
+
+    size_t dims() const
+    {
+        return m_shape.get_dims().size();
+    }
+
+    size_t length() const
+    {
+        return m_shape.size();
+    }
+
+    T* data() const
+    {
+        return m_buffer;
+    }
+
+    T at(size_t a_index) const
+    {
+        return m_buffer[a_index];
+    }
+
+    T operator()(size_t i)
+    {
+        return m_buffer[m_shape.get_offset(i)];
+    }
+
+    T operator()(size_t i, size_t j)
+    {
+        return m_buffer[m_shape.get_offset(i, j)];
+    }
+
+    T operator()(size_t i, size_t j, size_t k)
+    {
+        return m_buffer[m_shape.get_offset(i,j,k)];
+    }
+
+    T operator()(std::initializer_list<size_t> indices)
+    {
+        return m_buffer[m_shape.get_offset(indices)];
+    }
+
+  private:
+
+    void init_memory()
+    {
+        const size_t size = m_shape.size();
+        m_element_size = sizeof(T);
+        m_buffer = (T*) malloc(m_element_size * size);
+
+    }
+
+    T *m_buffer;
+    size_t m_element_size;
+    Shape m_shape;
 };
-
 
 class Constant : public Tensor
 {
-public:
-	Constant(double value);
-	Constant(std::vector<double> values);
-	Constant(double* values, int columns, int rows);
-	virtual ~Constant();
+  public:
+    Constant(double value);
+    virtual ~Constant();
 
-	double* evaluate(const Scope& scope);
-private:
-	double* data_buffer;
+    void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
+  private:
+    DataBlock<float> m_databuffer;
 };
 
-
-class Variable : public Tensor
-{
-public:
-	Variable(const std::string name);
-	Variable(const std::string name, Shape shape);
-	virtual ~Variable ();
-
-	double* evaluate(const Scope& scope);
-private:
-	std::string name;
-};
+}
