@@ -68,38 +68,18 @@ class Shape
 
 	size_t get_offset(size_t i)
     {
-
-        if (dims.size() < 1)
-        {
-            std::cout << "baaad!" << "\n";
-        }
-
         return strides[0]*i;
-
     };
 
 	size_t get_offset(size_t i, int j)
     {
-
-        if (dims.size() < 2)
-        {
-            std::cout << "baaad!" << "\n";
-        }
-
         return strides[0]*i + strides[1]*j;
 
     }
 
 	size_t get_offset(size_t i, size_t j, size_t k)
     {
-
-        if (dims.size() < 3)
-        {
-            std::cout << "baaad!" << "\n";
-        }
-
         return strides[0]*i + strides[1]*j + strides[2]*k;
-
     }
 
 	template<typename T, class Container = std::initializer_list<T>>
@@ -125,6 +105,24 @@ class Shape
         return offset;
     }
 
+    bool operator==(const Shape &other) const
+    {
+        for (auto i : ut::indices(other.dims))
+            if (this->dims[i].size != other.dims[i].size) return false;
+        return true;
+    }
+
+	const std::vector<Dimension>&  get_dims() const
+    {
+        return this->dims;
+    }
+
+    size_t size() const
+    {
+        return static_cast<size_t>(elements_cnt);
+	};
+
+  private:
 	void generate_strides()
     {
         strides.clear();
@@ -139,27 +137,12 @@ class Shape
 
     };
 
-	bool operator==(const Shape &other) const
-    {
-        for (auto i : ut::indices(other.dims))
-            if (this->dims[i].size != other.dims[i].size) return false;
-        return true;
-    }
-
-	const std::vector<Dimension>&  get_dims() const
-    {
-        return this->dims;
-    }
-
 	const std::vector<int>&  get_strides() const
     {
         return this->strides;
     }
 
-	size_t size() const
-    {
-        return static_cast<size_t>(elements_cnt);
-	};
+	
 
   private:
 	std::vector<Dimension> dims;
@@ -225,6 +208,7 @@ class BroadcastedShape
 
 	Shape to_shape() const
     {
+        
         std::vector<int> new_dims;
         int i = shape_1->get_dims().size()-1;
         int j = shape_2->get_dims().size()-1;
@@ -243,7 +227,7 @@ class BroadcastedShape
             for (; i >= 0; --i) {
                 new_dims.insert(new_dims.begin(), dims1[i].size);
             }
-        }
+        }        
         else if (j != -1)
         {
             for (; j >= 0; --j) {
