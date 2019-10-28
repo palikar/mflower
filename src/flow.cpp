@@ -23,12 +23,12 @@ int main(int, char**)
 
     auto c_1 = mf::constant(5.5);
     auto c_2 = mf::constant(10.5);
+    auto v_1 = mf::variable("v", 12.43);
 
+    auto res = mf::engine()->eval(v_1);
 
-    auto v_1 = mf::variable("v", 10.5);
-
-    mf::engine()->eval(c_1);
-
+    double res_double = res->data(0);
+    std::cout << res_double << "\n";
 
     mf::finalize();    
     return 0;

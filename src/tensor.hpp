@@ -139,14 +139,12 @@ class DataBlock
 
 
 
-
 enum class TensorType
 {
     Plain,
     Variable,
     Constant,
-    Operation
-    
+    Operation    
 };
 
 
@@ -197,6 +195,11 @@ class Tensor
                 m_data->set_val(values[i+size_1*j], i, j);
     }
 
+    void init_data(DataBlock<double> blk)
+    {
+        m_data = std::make_shared<DataBlock<double>>(blk);
+    }
+
 
     template<typename ... T>
     double data(T... index) const
@@ -206,7 +209,7 @@ class Tensor
 
     DataBlock<double> block() { return *m_data;}
     
-    // virtual void eval(EvaluationContext i, ReturnHandler);
+    virtual void eval(EvaluationContext i, ReturnHandler);
 
     const std::string& name() const {return m_id;};
 
@@ -226,7 +229,7 @@ class Constant : public Tensor
     virtual ~Constant()
     {};
 
-    // void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
+    void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
   private:
 };
 
@@ -239,7 +242,7 @@ class Variable : public Tensor
     virtual ~Variable()
     {};
 
-    // void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
+    void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
   private:
 };
 

@@ -142,10 +142,8 @@ target_link_libraries(mflower_lib
 
 add_executable(flow_test ${MFLOWER_APP_SRCS})
 target_link_libraries(flow_test
-    PRIVATE project_options project_warnings)
-target_link_libraries(flow_test
+    PRIVATE project_options project_warnings
     PUBLIC mflower_lib)
-
 
 install(TARGETS mflower_lib
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/
