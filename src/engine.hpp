@@ -37,7 +37,11 @@ struct EvaluationContext
     
 
     template<size_t i>
-    TensorPtr get_argument();
+    TensorPtr get_argument()
+    {
+        return m_args.at(i);
+    }
+    
     void update_variable(const std::string& name, TensorPtr value);
     void push_scope();
     Scope& scope();
@@ -107,6 +111,7 @@ class MFEngine
         while(!nodes.empty())
         {
             auto cur_node = nodes.front();
+
             auto followers = m_node_graph.get_following_edges(cur_node->name());
             nodes.pop();
             for(auto& f : followers)
@@ -115,16 +120,18 @@ class MFEngine
             }
             exe_stack.push({cur_node, std::move(followers)});
         }
-        
+
         while (!exe_stack.empty())
         {
             auto[node, deps] = exe_stack.top();
+            exe_stack.pop();
+            
             EvaluationContext ex(*this, deps);
             ReturnHandler rh(*this, node);
             node->eval(ex, rh);
-            exe_stack.pop();            
         }
 
+        
         return t_tens;
         
     }
@@ -146,12 +153,11 @@ void init();
 void finalize();
 MFEngine* engine();
 TensorPtr variable(std::string name, double value);
-TensorPtr constant(double value);
+TensorPtr constant(double value, std::string name);
 
-
+TensorPtr add(TensorPtr lhs, TensorPtr rhs, std::string name);
 
 // void placeholder(std::string name){}
-// void add(TensorPtr lhs, TensorPtr rhs){}
 // void sub(TensorPtr lhs, TensorPtr rhs){}
 // void mult(TensorPtr lhs, TensorPtr rhs){}
 // void devide(TensorPtr lhs, TensorPtr rhs){}

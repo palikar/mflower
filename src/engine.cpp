@@ -22,11 +22,11 @@ void EvaluationContext::update_variable(const std::string& name, TensorPtr value
 };
 
 
-template<size_t i>
-TensorPtr EvaluationContext::get_argument()
-{
-    return m_args.at(i);
-}
+// template<int i>
+// TensorPtr EvaluationContext::get_argument()
+// {
+//     return m_args.at(i);
+// }
 
 void EvaluationContext::push_scope(){}
 
@@ -62,12 +62,18 @@ TensorPtr variable(std::string name, double value)
     return var;
 }
 
-TensorPtr constant(double value)
+TensorPtr constant(double value, std::string name)
 {
-    auto cons = std::make_shared<Constant>(value);
+    auto cons = std::make_shared<Constant>(value, name);
     default_engine->add_tensor(cons);
     return cons;
 }
 
+TensorPtr add(TensorPtr lhs, TensorPtr rhs, std::string name)
+{
+    auto add = std::make_shared<AddOp>(name);
+    default_engine->add_tensor(add, {lhs, rhs});
+    return add;
+}
 
 }

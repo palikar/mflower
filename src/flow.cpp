@@ -20,13 +20,14 @@ int main(int, char**)
 {
     mf::init();
 
+    auto c_1 = mf::constant(17.0, "c:0");
+    auto c_2 = mf::constant(3.0, "c:1");
+    auto v_1 = mf::variable("v", 12.00);
 
-    auto c_1 = mf::constant(5.5);
-    auto c_2 = mf::constant(10.5);
-    auto v_1 = mf::variable("v", 12.43);
+    auto add_1 = mf::add(c_1, v_1, "add:0");
+    auto add_2 = mf::add(add_1, c_2, "add:1");
 
-    auto res = mf::engine()->eval(v_1);
-
+    auto res = mf::engine()->eval(add_2);
     double res_double = res->data(0);
     std::cout << res_double << "\n";
 

@@ -24,5 +24,18 @@ void Constant::eval(EvaluationContext, ReturnHandler a_handler)
 }
 
 
+void AddOp::eval(EvaluationContext a_context, ReturnHandler a_handler)
+{
+    auto lhs = a_context.get_argument<0>();
+    auto rhs = a_context.get_argument<1>();
+
+    double res = lhs->data(0) + rhs->data(0);
+    DataBlock<double> res_blk(1);
+
+    res_blk.set_val(res, 0);
+    a_handler.result(res_blk);
+}
+
+
 
 }

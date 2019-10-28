@@ -138,7 +138,6 @@ class DataBlock
 };
 
 
-
 enum class TensorType
 {
     Plain,
@@ -222,7 +221,7 @@ class Tensor
 class Constant : public Tensor
 {
   public:
-    Constant(double value) : Tensor("constant:0")
+    Constant(double value, std::string name) : Tensor(std::move(name))
     {
         this->init_data(&value, 1);
     }
@@ -237,13 +236,17 @@ class Constant : public Tensor
 class Variable : public Tensor
 {
   public:
-    Variable(std::string name) : Tensor(name)
-    {}
-    virtual ~Variable()
-    {};
-
+    Variable(std::string name) : Tensor(name) {}
+    virtual ~Variable() {};
     void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
-  private:
+};
+
+class AddOp : public Tensor
+{
+  public:
+    AddOp(std::string name) : Tensor(name) {}
+    virtual ~AddOp() {};
+    void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
 };
 
 
