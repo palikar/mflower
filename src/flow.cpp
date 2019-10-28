@@ -27,7 +27,7 @@ int main(int, char**)
 
     auto v_1 = mf::variable("v", 10.5);
 
-    
+    mf::engine()->eval(c_1);
 
 
     mf::finalize();    

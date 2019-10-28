@@ -6,6 +6,10 @@
 #include <iterator>
 #include <utility>
 #include <memory>
+#include <queue>
+#include<stack>
+#include <iostream>
+
 
 #include "./tensor.hpp"
 #include "./graph.hpp"
@@ -18,7 +22,12 @@ namespace mf
 
 struct EvaluationContext
 {
-    
+
+    // the engine
+    // easy access to the scope
+
+    // easy access to the arguments/dependencies
+    // the dependencies should be evaluated
 };
 
 struct ReturnHandler
@@ -50,21 +59,52 @@ class MFEngine
     void add_tensor(TensorPtr t_tens)
     {
         m_tensor_buffer.push_back(t_tens);
-        m_node_graph.add_node(t_tens->name(), t_tens.get());
+        m_node_graph.add_node(t_tens->name(), t_tens);
     }
 
     void add_variable(VariablePtr t_var)
     {
-        m_tensor_buffer.push_back(t_var);
+        add_tensor(t_var);
         m_scope.put_variable(t_var->name(), t_var->block());
     }
 
+    void eval(TensorPtr t_tens)
+    {
+        std::stack<std::pair<TensorPtr, std::vector<TensorPtr>>> ex_stack;
+        std::queue<TensorPtr> nodes;
+        nodes.push(t_tens);
+
+        while(!nodes.empty())
+        {
+            auto cur_node = nodes.front();
+            auto followers = m_node_graph.get_following_edges(cur_node->name());
+            nodes.pop();
+            for(auto& f : followers)
+            {
+                nodes.push(f);
+            }
+            ex_stack.push({cur_node, std::move(followers)});
+        }
+
+        EvaluationContext ev;
+        
+        while (!ex_stack.empty())
+        {
+            auto[node, deps] = ex_stack.top();
+
+            
+
+            ex_stack.pop();            
+        }
+        
+    }
+        
     
 
     
   private:
     Scope m_scope;
-    Graph<Tensor*> m_node_graph;
+    Graph<std::shared_ptr<Tensor>> m_node_graph;
     std::vector<std::shared_ptr<Tensor>> m_tensor_buffer;
     std::unordered_map<std::string, DataBlock<double>> m_execution_buffer;
     
