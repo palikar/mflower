@@ -19,8 +19,8 @@ namespace ut = ranges;
 
 
 // Forward declarations
-class EvaluationContext;
-class ReturnHandler;
+struct EvaluationContext;
+struct ReturnHandler;
 
 template<typename T>
 class DataBlock
@@ -122,9 +122,7 @@ class DataBlock
         m_buffer[m_shape.get_offset(indices)]  = val;
     }
 
-    
-
-  private:
+  protected:
     
     void init_memory()
     {
@@ -206,30 +204,45 @@ class Tensor
         return m_data->operator()(index...);
     }
 
-    template<typename ... T>
-    double ref(T... i)
-    {
-        m_data->se
-        return 0.0;
-    }
+    DataBlock<double> block() { return *m_data;}
     
     // virtual void eval(EvaluationContext i, ReturnHandler);
 
-  private:
+    const std::string& name() const {return m_id;};
+
+  protected:
     std::string m_id;
     TensorType m_type;
-    std::shared_ptr<DataBlock<double> > m_data;
+    std::shared_ptr<DataBlock<double>> m_data;
 };
 
 class Constant : public Tensor
 {
   public:
-    Constant(double value);
-    virtual ~Constant();
+    Constant(double value) : Tensor("constant:0")
+    {
+        this->init_data(&value, 1);
+    }
+    virtual ~Constant()
+    {};
 
     // void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
   private:
-    DataBlock<float> m_databuffer;
 };
+
+
+class Variable : public Tensor
+{
+  public:
+    Variable(std::string name) : Tensor(name)
+    {}
+    virtual ~Variable()
+    {};
+
+    // void eval(EvaluationContext a_context, ReturnHandler a_handler) override;
+  private:
+};
+
+
 
 }
