@@ -1,5 +1,6 @@
-#include "./utils/std_headers.hpp"
+#pragma once
 
+#include "./utils/std_headers.hpp"
 #include "./shape.hpp"
 
 
@@ -39,28 +40,36 @@ class DataBuffer_Base
 
     virtual void init() = 0;
     virtual void destroy() = 0;
-    virtual void* data() = 0;
-    virtual size_t size() = 0;
+    virtual void* data() const = 0;
+    virtual size_t size() const = 0;
 
     template<typename T>
-    T* at(size_t index)
+    T* at(size_t index) const
     {
         auto ptr = (static_cast<T*>(this->data()) + index);
         return ptr;
     }
 
-
     template<typename ... T>
-    double operator()(T... index)
+    double& operator()(T... index)
     {
         const size_t offeset = m_shape.get_offset(static_cast<size_t>(index)...);
         return *this->at<double>(offeset);
     }
 
-    const Shape shape() const {return m_shape;}
+    template<typename ... T>
+    const double& operator()(T... index) const
+    {
+        const size_t offeset = m_shape.get_offset(static_cast<size_t>(index)...);
+        return *this->at<double>(offeset);
+    }
+
+    const std::vector<Dimension>& dims() const { return m_shape.get_dims(); }
+    const Shape& shape() const {return m_shape;}    
 
   public:
     static const bool is_static = false;
+  protected:
     Shape m_shape;
     DataTypes m_type;
   private:
@@ -83,8 +92,8 @@ class StaticDataBuffer : public DataBuffer_Base
     
     void init() override {};
     void destroy() override {};
-    void* data() override {return &m_data[0];}
-    size_t size() {return N;};
+    void* data() const override {return &m_data[0];}
+    size_t size() const override{return N;};
     
   public:
     static const bool is_static = true;
@@ -109,14 +118,15 @@ class DynamicDataBuffer : public DataBuffer_Base
 
     void init() override { m_data = malloc(m_size * sizeof(T)); };
     void destroy() override { free(m_data); };
-    void* data() override {return m_data;}
-    size_t size() {return m_size;};
+    void* data() const override {return m_data;}
+    size_t size() const override {return m_size;};
 
   public:
     static const bool is_static = false;
   private:
     void* m_data;
-    const size_t m_size;
+    size_t m_size;
+    const size_t m_el_size = sizeof(T);
 };
 
 
@@ -183,6 +193,14 @@ struct DataBlockHelper
         
         return blk;
     }
+    
+    inline static auto get(const Shape& t_shape)
+    {
+        DynamicDataBuffer<float> blk(t_shape, t_shape.size());
+        blk.init();
+        return blk;
+    }
+
 
     // handles array constructions
     template<typename T, size_t...N>

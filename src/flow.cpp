@@ -37,6 +37,8 @@ int main(int, char**)
     
     std::cout << b_1.shape() << "\n";
 
+    b_1(0) = 10;
+        
     std::cout << b_1(0) << "\n";
     std::cout << b_1(1) << "\n";
     std::cout << b_1(2) << "\n";

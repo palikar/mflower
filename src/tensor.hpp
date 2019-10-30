@@ -1,14 +1,9 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <initializer_list>
-#include <stdexcept>
-#include <memory>
+#include "./utils/std_headers.hpp"
+#include "./data.hpp"
 
 #include <ranges.hpp>
-#include "shape.hpp"
 
 
 
@@ -21,122 +16,6 @@ namespace ut = ranges;
 // Forward declarations
 struct EvaluationContext;
 struct ReturnHandler;
-
-template<typename T>
-class DataBlock
-{
-  public:
-
-    explicit DataBlock(Shape a_shape) : m_shape(std::move(a_shape))
-    {
-        this->init_memory();
-    }
-    
-    explicit DataBlock(size_t i) : m_shape(i)
-    {
-        this->init_memory();
-    }
-
-    DataBlock(size_t i, size_t j) : m_shape({i, j})
-    {
-        this->init_memory();
-    }
-
-    DataBlock(size_t i, size_t j, size_t k) : m_shape({i, j, k})
-    {
-        this->init_memory();
-    }
-
-    ~DataBlock()
-    {
-    };
-
-    size_t dims() const
-    {
-        return m_shape.get_dims().size();
-    }
-
-    size_t length() const
-    {
-        return m_shape.size();
-    }
-
-    T* data() const
-    {
-        return m_buffer;
-    }
-
-    T at(size_t a_index) const
-    {
-        return m_buffer[a_index];
-    }
-
-    T operator()(size_t i)
-    {
-        if (this->dims() != 1)
-            throw std::runtime_error("The data block must have dimension of 1");
-                
-        return m_buffer[m_shape.get_offset(i)];
-    }
-
-    T operator()(size_t i, size_t j)
-    {
-        if (this->dims() != 2)
-            throw std::runtime_error("The data block must have dimension of 2");
-        
-        return m_buffer[m_shape.get_offset(i, j)];
-    }
-
-    T operator()(size_t i, size_t j, size_t k)
-    {
-        if (this->dims() != 3)
-            throw std::runtime_error("The data block must have dimension of 3");
-        
-        return m_buffer[m_shape.get_offset(i,j,k)];
-    }
-
-    T operator()(std::initializer_list<size_t> indices)
-    {
-        if (this->dims() != std::size(indices))
-            throw std::runtime_error("The data block must have dimension of 1");
-        return m_buffer[m_shape.get_offset(indices)];
-    }
-
-    void set_val(T val, size_t i)
-    {
-        m_buffer[m_shape.get_offset(i)]  = val;
-    }
-
-    void set_val(T val, size_t i, size_t j)
-    {
-        m_buffer[m_shape.get_offset(i, j)]  = val;
-    }
-
-    void set_val(T val, size_t i, size_t j, size_t k)
-    {
-        m_buffer[m_shape.get_offset(i, j, k)]  = val;
-    }
-
-    void set_val(T val, std::initializer_list<size_t> indices)
-    {
-        m_buffer[m_shape.get_offset(indices)]  = val;
-    }
-
-  protected:
-    
-    void init_memory()
-    {
-        const size_t size = m_shape.size();
-        m_element_size = sizeof(T);
-        m_buffer = (T*) malloc(m_element_size * size);
-
-    }
-
-    T *m_buffer;
-    size_t m_element_size;
-    Shape m_shape;
-};
-
 
 enum class TensorType
 {
@@ -215,7 +94,8 @@ class Tensor
   protected:
     std::string m_id;
     TensorType m_type;
-    std::shared_ptr<DataBlock<double>> m_data;
+
+    std::variant;
 };
 
 class Constant : public Tensor
