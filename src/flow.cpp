@@ -2,8 +2,9 @@
 #include <vector>
 #include <algorithm>
 
-#include "tensor.hpp"
-#include "engine.hpp"
+// #include "tensor.hpp"
+// #include "engine.hpp"
+#include "data.hpp"
 
 
 template <typename T>
@@ -18,19 +19,29 @@ std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
 
 int main(int, char**)
 {
-    mf::init();
+    // mf::init();
 
-    auto c_1 = mf::constant(17.0, "c:0");
-    auto c_2 = mf::constant(3.0, "c:1");
-    auto v_1 = mf::variable("v", 12.00);
+    // auto c_1 = mf::constant(17.0, "c:0");
+    // auto c_2 = mf::constant(3.0, "c:1");
+    // auto v_1 = mf::variable("v", 12.00);
+    // auto add_1 = mf::add(c_1, v_1, "add:0");
+    // auto add_2 = mf::add(add_1, c_2, "add:1");
+    // auto res = mf::engine()->eval(add_2);
+    // double res_double = res->data(0);
+    // std::cout << res_double << "\n";
 
-    auto add_1 = mf::add(c_1, v_1, "add:0");
-    auto add_2 = mf::add(add_1, c_2, "add:1");
 
-    auto res = mf::engine()->eval(add_2);
-    double res_double = res->data(0);
-    std::cout << res_double << "\n";
+    auto a = {1.0, 2.0, 3.0};
+    auto b_1 = mf::value(a);
+    std::cout << "b_1: " << b_1.shape()  << "\n";
 
-    mf::finalize();    
+    // auto b_2 = mf::value(1.0);
+    // auto b_3 = mf::value(1.0, 2.0, 3.0, 4.0);
+
+    // std::cout << "b_2: "  << b_2.shape()  << "\n";
+    // std::cout << "b_3: " << b_3.shape()  << "\n";
+    
+
+    // mf::finalize();    
     return 0;
 }
