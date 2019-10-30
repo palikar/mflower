@@ -7,3 +7,4 @@
 #include <stdexcept>
 #include <memory>
 #include <array>
+#include <cstring>

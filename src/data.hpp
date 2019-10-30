@@ -23,6 +23,10 @@ enum class DataTypes
 class DataBuffer_Base
 {
   public:
+    
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    
  
     explicit DataBuffer_Base(Shape a_shape) : m_shape(a_shape)
     {};
@@ -34,14 +38,23 @@ class DataBuffer_Base
     virtual ~DataBuffer_Base(){};
 
     virtual void init() = 0;
-    virtual void* data() = 0;
     virtual void destroy() = 0;
+    virtual void* data() = 0;
+    virtual size_t size() = 0;
 
     template<typename T>
     T* at(size_t index)
     {
         auto ptr = (static_cast<T*>(this->data()) + index);
         return ptr;
+    }
+
+
+    template<typename ... T>
+    double operator()(T... index)
+    {
+        const size_t offeset = m_shape.get_offset(static_cast<size_t>(index)...);
+        return *this->at<double>(offeset);
     }
 
     const Shape shape() const {return m_shape;}
@@ -58,39 +71,56 @@ template<size_t N, typename T>
 class StaticDataBuffer : public DataBuffer_Base
 {
   public:
+    typedef T                                     value_type;
+    typedef value_type&                           reference;
+    typedef const value_type&                     const_reference;
+    typedef value_type*                           pointer;
+    typedef const value_type*                     const_pointer;
+
+    
     StaticDataBuffer(Shape a_shape) : DataBuffer_Base(a_shape) {};
     ~StaticDataBuffer(){};
     
     void init() override {};
     void destroy() override {};
-    void* data() override {return m_data.data();}
+    void* data() override {return &m_data[0];}
+    size_t size() {return N;};
     
   public:
-    static const bool is_static = false;
+    static const bool is_static = true;
   private:
-    std::array<T, N> m_data;
+    T m_data[N];
 };
 
-
+template <typename T>
 class DynamicDataBuffer : public DataBuffer_Base
 {
   public:
+    
+    typedef T                                     value_type;
+    typedef value_type&                           reference;
+    typedef const value_type&                     const_reference;
+    typedef value_type*                           pointer;
+    typedef const value_type*                     const_pointer;
+
+    
     DynamicDataBuffer(Shape a_shape, size_t n) : DataBuffer_Base(a_shape), m_size(n) {};
     ~DynamicDataBuffer(){};
 
-    void init() override { m_data = malloc(m_size * sizeof(void*)); };
+    void init() override { m_data = malloc(m_size * sizeof(T)); };
     void destroy() override { free(m_data); };
     void* data() override {return m_data;}
+    size_t size() {return m_size;};
 
   public:
     static const bool is_static = false;
   private:
     void* m_data;
-    size_t m_size;
+    const size_t m_size;
 };
 
 
-struct DataBlockFact
+struct DataBlockHelper
 {
   private:
 
@@ -107,7 +137,7 @@ struct DataBlockFact
         }
         else
         {
-            auto b = new DynamicDataBuffer(Shape(N...), SIZE);
+            auto b = new DynamicDataBuffer<T>(Shape(N...), SIZE);
             b->init();
             return b;
         }
@@ -126,7 +156,7 @@ struct DataBlockFact
         }
         else
         {
-            DynamicDataBuffer b(Shape(N...), SIZE);
+            DynamicDataBuffer<T> b(Shape(N...), SIZE);
             b.init();
             return b;
         }
@@ -135,44 +165,47 @@ struct DataBlockFact
     template<typename Type, typename...T>
     static auto get_block_stack(T...dims)
     {
-        constexpr size_t SIZE = (dims * ...);
-        DynamicDataBuffer b(Shape(dims...), SIZE);
+        const size_t SIZE = (dims * ...);
+        DynamicDataBuffer<Type> b(Shape(dims...), SIZE);
         b.init();
         return b;
     }
 
 
   public:
-    
-    template<typename T, size_t...N>
-    inline static auto get(const T* values)
-    {
-        auto blk = DataBlockFact::get_block_stack<T, N...>();
-        return blk;
-}
-
 
     template<typename T>
-    inline static auto get(T value)
+    inline static auto get(const std::vector<T>& vec)
     {
-        auto blk = DataBlockFact::get_block_stack<T, 1>();
-        auto ptr = blk.template at<T>(0);
-        *ptr = value;
+        auto blk = DataBlockHelper::get_block_stack<T>(vec.size());
+        for (size_t i = 0; i < std::size(vec); ++i)
+            *blk.template at<T>(i) = vec.at(i);
+        
         return blk;
     }
 
+    // handles array constructions
+    template<typename T, size_t...N>
+    inline static auto get(const T* values)
+    {
+        constexpr size_t SIZE = (N * ... );
+        auto blk = DataBlockHelper::get_block_stack<T, N...>();
 
+        for (size_t i = 0; i < SIZE; ++i)
+            *blk.template at<T>(i) = *(values + i);
+        
+        return blk;
+    }
+
+    // handles value(1.3, 1.4, 1.6,...) constructions
     template<typename ... T>
     inline static auto get(T ... values)
     {
         using c_t = std::common_type_t<T...>;
         constexpr size_t s = sizeof...(values);
-        auto blk = DataBlockFact::get_block_stack<c_t, s>();
-        
+        auto blk = DataBlockHelper::get_block_stack<c_t, s>();
         size_t index = 0;
-
         ((*blk.template at<c_t>(index++) = values), ...);
-        
         return blk;
     }
     
@@ -184,7 +217,7 @@ struct DataBlockFact
 template<typename... Args>
 auto value(Args&&... args)
 {
-    return DataBlockFact::get(std::forward<Args>(args)...);
+    return DataBlockHelper::get(std::forward<Args>(args)...);
 }
 
 
@@ -223,8 +256,8 @@ auto value(Args&&... args)
 #define VALUE_FUN(dim) template<typename T, SIZE_T_S_##dim>     \
     inline static auto value(const T(&values) BRACKETS_S_##dim) \
     {                                                           \
-        const T* s = reinterpret_cast<const T*>(&values);       \
-        return DataBlockFact::get<T, LETTERS_S_##dim>(s);       \
+        const T* s = reinterpret_cast<const T*>(&values);         \
+        return DataBlockHelper::get<T, LETTERS_S_##dim>(s);       \
     }
 
 VALUE_FUN(0) // one-dim array
