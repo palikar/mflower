@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <type_traits>
 
 // #include "tensor.hpp"
 // #include "engine.hpp"
@@ -31,9 +32,25 @@ int main(int, char**)
     // std::cout << res_double << "\n";
 
 
-    auto a = {1.0, 2.0, 3.0};
-    auto b_1 = mf::value(a);
-    std::cout << "b_1: " << b_1.shape()  << "\n";
+    auto b_1 = mf::value(42.0, 41.0, 40.0);
+    
+    std::cout << b_1.shape() << "\n";
+    std::cout << *b_1.at<double>(0) << "\n";
+    std::cout << *b_1.at<double>(1) << "\n";
+    std::cout << *b_1.at<double>(2) << "\n";
+
+    // auto b_2 = mf::value({{1.0, 2.0, 3.0}, {1.0, 2.0, 3.0}});
+    // std::cout << b_2.shape() << "\n";
+
+    // auto b_3 = mf::value({{{1.0, 2.0, 3.0}}});
+    // std::cout << b_3.shape() << "\n";
+    
+
+    
+
+    
+
+// std::cout << "b_1: " << b_1.shape()  << "\n";
 
     // auto b_2 = mf::value(1.0);
     // auto b_3 = mf::value(1.0, 2.0, 3.0, 4.0);
