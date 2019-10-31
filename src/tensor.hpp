@@ -95,7 +95,15 @@ class Tensor
     std::string m_id;
     TensorType m_type;
 
-    std::variant;
+    template <typename T, size_t N>
+    union Data
+    {
+        DynamicDataBuffer<T> dyn;
+        StaticDataBuffer<N, T> stat;
+    };
+
+    Data d;
+    
 };
 
 class Constant : public Tensor
