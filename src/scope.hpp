@@ -14,38 +14,38 @@ namespace mf
 // class DataBlock;
 
 
-	class Scope
-	{
+class Scope
+{
   public:
     Scope()
-			{};
+    {};
 
     ~Scope()
-			{};
-
-    DataBlock<double> get_variable_value(const std::string& name) const
-			{
+    {};
+    
+    DataBuffer_Base* get_variable_value(const std::string& name) const
+    {
         return m_variables.at(name);
-			}
-
-    void put_variable(const std::string& name, DataBlock<double> val)
-			{
+    }
+        
+    void put_variable(const std::string& name, DataBuffer_Base* val)
+    {
         m_variables.insert({name, val});
-			}
+    }
 
-		void push(){};
-		void pop(){};
+    void push(){};
+    void pop(){};
 
 	
-		void set(const std::string& name, DataBlock<double> val)
-			{
-				m_variables.insert({name, val});
-			}
+    void set(const std::string& name, DataBuffer_Base* val)
+    {
+        m_variables.insert({name, val});
+    }
     
     
-	private:
+  private:
     
-    std::unordered_map<std::string, DataBlock<double>> m_variables;
-	};
+    std::unordered_map<std::string, DataBuffer_Base*> m_variables;
+};
 
 }

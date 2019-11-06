@@ -7,7 +7,7 @@
 #include <utility>
 #include <memory>
 #include <queue>
-#include<stack>
+#include <stack>
 #include <iostream>
 
 
@@ -16,25 +16,20 @@
 #include "./operations.hpp"
 #include "./scope.hpp"
 
+
+
 namespace mf
 {
 
-//Tracer - to track what is being executed
-//Optimizer to keep the graph nice and clean
-	
 
 class MFEngine;
-typedef std::shared_ptr<Tensor> TensorPtr;
-typedef std::shared_ptr<Variable> VariablePtr;
 
 struct EvaluationContext
 {
-
+    
     template<typename...TensType>
     EvaluationContext(MFEngine& t_engine, TensType... t_tensors);
-
     EvaluationContext(MFEngine& t_engine, std::vector<TensorPtr> t_tensors);
-    
 
     template<size_t i>
     TensorPtr get_argument()
@@ -45,8 +40,6 @@ struct EvaluationContext
     void update_variable(const std::string& name, TensorPtr value);
     void push_scope();
     Scope& scope();
-    
-
   private:
     std::reference_wrapper<MFEngine> m_engine;
     std::vector<TensorPtr> m_args;
@@ -54,21 +47,10 @@ struct EvaluationContext
 
 struct ReturnHandler
 {
-    ReturnHandler(MFEngine& t_engine, TensorPtr t_result_location) : m_engine(t_engine),
-                                                                     m_result_location(t_result_location)
-    {};
-    // the tensors put their resutls here
+    ReturnHandler(MFEngine& t_engine, TensorPtr t_result_location);
 
-    void result(DataBlock<double> blk)
-    {
-        m_result_location.get()->init_data(blk);
-    }
-
-    void operator=(const DataBlock<double> blk)
-    {
-        m_result_location.get()->init_data(blk);
-    }
-
+    void result(const DataBuffer_Base*);
+    void operator=(const DataBuffer_Base*);    
   private:
     std::reference_wrapper<MFEngine> m_engine;
     std::reference_wrapper<TensorPtr> m_result_location;
@@ -143,20 +125,22 @@ class MFEngine
     
   private:
     Scope m_scope;
-    Graph<std::shared_ptr<Tensor>> m_node_graph;
-    std::vector<std::shared_ptr<Tensor>> m_tensor_buffer;
-    std::unordered_map<std::string, DataBlock<double>> m_execution_buffer;
+    Graph<TensorPtr> m_node_graph;
+    std::vector<TensorPtr> m_tensor_buffer;
+    // std::unordered_map<std::string, DataBlock<double>> m_execution_buffer;
     
 };
 
 void init();
 void finalize();
 MFEngine* engine();
-TensorPtr variable(std::string name, double value);
-TensorPtr constant(double value, std::string name);
 
-TensorPtr add(TensorPtr lhs, TensorPtr rhs, std::string name);
 
+TensorPtr variable(std::string name);
+
+
+
+// TensorPtr add(TensorPtr lhs, TensorPtr rhs, std::string name);
 // void placeholder(std::string name){}
 // void sub(TensorPtr lhs, TensorPtr rhs){}
 // void mult(TensorPtr lhs, TensorPtr rhs){}

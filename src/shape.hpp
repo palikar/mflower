@@ -257,12 +257,4 @@ bool is_broadcastable(const Shape& s1, const Shape& s2) noexcept;
 }
 
 
-std::ostream& operator<< (std::ostream& out, const mf::Shape& v) {
-    out << "<Shape(";
-    for (const auto& d : v.get_dims())
-    {
-        out << d.size << ",";
-    }
-    out << ")>";
-    return out;
-}
+std::ostream& operator<< (std::ostream& out, const mf::Shape& v);

@@ -40,11 +40,11 @@ class DataBuffer_Base
 
     virtual void init() = 0;
     virtual void destroy() = 0;
-    virtual void* data() const = 0;
+    virtual void* data() = 0;
     virtual size_t size() const = 0;
 
     template<typename T>
-    T* at(size_t index) const
+    T* at(size_t index)
     {
         auto ptr = (static_cast<T*>(this->data()) + index);
         return ptr;
@@ -52,13 +52,6 @@ class DataBuffer_Base
 
     template<typename ... T>
     double& operator()(T... index)
-    {
-        const size_t offeset = m_shape.get_offset(static_cast<size_t>(index)...);
-        return *this->at<double>(offeset);
-    }
-
-    template<typename ... T>
-    const double& operator()(T... index) const
     {
         const size_t offeset = m_shape.get_offset(static_cast<size_t>(index)...);
         return *this->at<double>(offeset);
@@ -74,7 +67,6 @@ class DataBuffer_Base
     DataTypes m_type;
   private:
 };
-
 
 template<size_t N, typename T>
 class StaticDataBuffer : public DataBuffer_Base
@@ -92,7 +84,7 @@ class StaticDataBuffer : public DataBuffer_Base
     
     void init() override {};
     void destroy() override {};
-    void* data() const override {return &m_data[0];}
+    void* data() override {return m_data;}
     size_t size() const override{return N;};
     
   public:
@@ -118,7 +110,7 @@ class DynamicDataBuffer : public DataBuffer_Base
 
     void init() override { m_data = malloc(m_size * sizeof(T)); };
     void destroy() override { free(m_data); };
-    void* data() const override {return m_data;}
+    void* data() override {return m_data;}
     size_t size() const override {return m_size;};
 
   public:
@@ -201,7 +193,6 @@ struct DataBlockHelper
         return blk;
     }
 
-
     // handles array constructions
     template<typename T, size_t...N>
     inline static auto get(const T* values)
@@ -274,9 +265,10 @@ auto value(Args&&... args)
 #define VALUE_FUN(dim) template<typename T, SIZE_T_S_##dim>     \
     inline static auto value(const T(&values) BRACKETS_S_##dim) \
     {                                                           \
-        const T* s = reinterpret_cast<const T*>(&values);         \
-        return DataBlockHelper::get<T, LETTERS_S_##dim>(s);       \
+        const T* s = reinterpret_cast<const T*>(&values);       \
+        return DataBlockHelper::get<T, LETTERS_S_##dim>(s);     \
     }
+
 
 VALUE_FUN(0) // one-dim array
 VALUE_FUN(1) // two-dim array
