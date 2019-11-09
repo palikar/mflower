@@ -1,25 +1,13 @@
 #pragma once
 
+
 #include "./utils/std_headers.hpp"
 #include "./shape.hpp"
+#include "./data_type.hpp"
 
 
 namespace mf
 {
-
-enum class DataTypes
-{
-    t_int8,
-    t_int16,
-    t_int32,
-    t_int64,
-    t_float32,
-    t_float64,
-    t_uint8,
-    t_uint16,
-    t_uint32,
-    t_uint64
-};
 
 class DataBuffer_Base
 {
@@ -30,6 +18,9 @@ class DataBuffer_Base
     
  
     explicit DataBuffer_Base(Shape a_shape) : m_shape(a_shape)
+    {};
+
+    explicit DataBuffer_Base(Shape a_shape, DataTypeInfo t_type) : m_shape(a_shape), m_type(t_type)
     {};
 
     DataBuffer_Base(DataBuffer_Base&& ) = delete;
@@ -43,6 +34,13 @@ class DataBuffer_Base
     virtual void* data() = 0;
     virtual size_t size() const = 0;
 
+    template<typename Target, typename Source>
+    static Target get_aux(size_t index, void* loc)
+    {
+        
+        return static_cast<Target>(*(static_cast<Source*>(loc) + index));
+    }
+
     template<typename T>
     T* at(size_t index)
     {
@@ -50,11 +48,32 @@ class DataBuffer_Base
         return ptr;
     }
 
-    template<typename ... T>
-    double& operator()(T... index)
+    template<typename F, typename ... T>
+    F get_as(T... index)
     {
-        const size_t offeset = m_shape.get_offset(static_cast<size_t>(index)...);
-        return *this->at<double>(offeset);
+        const size_t offset = m_shape.get_offset(static_cast<size_t>(index)...);
+        switch (m_type.dtype())
+        {
+          case DataType::t_float32: return get_aux<F, float>(offset, this->data());
+          case DataType::t_float64: return  get_aux<F, double>(offset, this->data());
+          case DataType::t_int8: return  get_aux<F, uint8_t>(offset, this->data());
+          case DataType::t_int16: return  get_aux<F, uint16_t>(offset, this->data());
+          case DataType::t_int32: return  get_aux<F, uint32_t>(offset, this->data());
+          case DataType::t_int64: return  get_aux<F, uint64_t >(offset, this->data());
+          default: return {};
+
+        }
+    }
+
+    // template<typename ... T>
+    // double operator()(T... index)
+    // {
+    //     return this->index<double>(index...);
+    // }
+
+    const DataTypeInfo& type_info() const 
+    {
+        return m_type;
     }
 
     const std::vector<Dimension>& dims() const { return m_shape.get_dims(); }
@@ -64,7 +83,7 @@ class DataBuffer_Base
     static const bool is_static = false;
   protected:
     Shape m_shape;
-    DataTypes m_type;
+    DataTypeInfo m_type;
   private:
 };
 
@@ -79,7 +98,7 @@ class StaticDataBuffer : public DataBuffer_Base
     typedef const value_type*                     const_pointer;
 
     
-    StaticDataBuffer(Shape a_shape) : DataBuffer_Base(a_shape) {};
+    StaticDataBuffer(Shape a_shape) : DataBuffer_Base(a_shape, data_type<T>()) {};
     ~StaticDataBuffer(){};
     
     void init() override {};
@@ -105,8 +124,12 @@ class DynamicDataBuffer : public DataBuffer_Base
     typedef const value_type*                     const_pointer;
 
     
-    DynamicDataBuffer(Shape a_shape, size_t n) : DataBuffer_Base(a_shape), m_size(n) {};
-    ~DynamicDataBuffer(){};
+    DynamicDataBuffer(Shape a_shape, size_t n) : DataBuffer_Base(a_shape, mf::data_type<T>()),
+                                                 m_size(n)
+    {};
+    
+    ~DynamicDataBuffer()
+    {};
 
     void init() override { m_data = malloc(m_size * sizeof(T)); };
     void destroy() override { free(m_data); };
