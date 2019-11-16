@@ -42,24 +42,27 @@ int main(int, char**)
     // std::cout << "a_t_1 : " << a_t.data_name() << "\n";
 
 
-    auto b_1 = mf::value(1.0f, 42.2f, 3.0f);
+    auto b_1 = mf::value(1.0, 42.2, 3.0);
+    auto b_2 = mf::value(1.0, 42.2, 3.0, 43.0);
+    
+    
 
-    std::cout << b_1.shape() << "\n";
-    std::cout << b_1.type_info().data_name() << "\n";
-
-    // std::cout << b_1(0) << "\n";
-    std::cout << b_1.get_as<double>(0) << "\n";
-    std::cout << b_1.get_as<float>(0) << "\n";
-    std::cout << b_1.get_as<int>(0) << "\n";
-    std::cout << "-----------" << "\n";
-    std::cout << b_1.get_as<double>(1) << "\n";
-    std::cout << b_1.get_as<float>(1) << "\n";
-    std::cout << b_1.get_as<int>(1) << "\n";
-    std::cout << "-----------" << "\n";
-    std::cout << b_1.get_as<double>(2) << "\n";
-    std::cout << b_1.get_as<float>(2) << "\n";
-    std::cout << b_1.get_as<int>(2) << "\n";
-    std::cout << "-----------" << "\n";
+    // std::cout << b_1.shape() << "\n";
+    // std::cout << b_1.type_info().data_name() << "\n";
+    // std::cout << b_1(1) << "\n";
+    // std::cout << "-----------" << "\n";
+    // std::cout << b_1.get_as<double>(0) << "\n";
+    // std::cout << b_1.get_as<float>(0) << "\n";
+    // std::cout << b_1.get_as<int>(0) << "\n";
+    // std::cout << "-----------" << "\n";
+    // std::cout << b_1.get_as<double>(1) << "\n";
+    // std::cout << b_1.get_as<float>(1) << "\n";
+    // std::cout << b_1.get_as<int>(1) << "\n";
+    // std::cout << "-----------" << "\n";
+    // std::cout << b_1.get_as<double>(2) << "\n";
+    // std::cout << b_1.get_as<float>(2) << "\n";
+    // std::cout << b_1.get_as<int>(2) << "\n";
+    // std::cout << "-----------" << "\n";
 
 
 

@@ -46,7 +46,7 @@ class Tensor : public Tensor_Base
     Tensor(std::string name, BlockType blk) : Tensor_Base(std::move(name)), m_block(blk){}
 
     template<typename Block>
-    void set_value(const Block& blk)
+    void set_value(const Block&)
     {
         
     }
